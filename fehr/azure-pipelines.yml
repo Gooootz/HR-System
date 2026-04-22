@@ -1,0 +1,78 @@
+# trigger:
+#   - develop
+#   - main
+#   - release/*
+
+# pr:
+#   branches:
+#     include:
+#       - develop
+#       - release/*
+#       - main
+
+# variables:
+#   imageRepository: "fehr"
+#   dockerfilePath: "$(Build.SourcesDirectory)/Dockerfile"
+#   tag: "$(Build.BuildId)"
+#   vmImageName: "ubuntu-latest"
+
+# stages:
+#   # Stage for 'develop' branch
+#   - stage: Develop
+#     displayName: Build and Push for Develop
+#     condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+#     jobs:
+#       - job: Build
+#         displayName: Build and Push to Dev ACR
+#         pool:
+#           vmImage: $(vmImageName)
+#         steps:
+#           - task: Docker@2
+#             displayName: Build and push to Dev ACR
+#             inputs:
+#               command: buildAndPush
+#               repository: $(imageRepository)
+#               dockerfile: $(dockerfilePath)
+#               containerRegistry: AldersgateOdelDev
+#               tags: |
+#                 latest
+
+#   # Stage for 'release/*' branches
+#   - stage: Release
+#     displayName: Build and Push for Release
+#     condition: and(contains(variables['Build.SourceBranch'], 'release/'), ne(variables['Build.SourceBranch'], 'refs/heads/develop'), ne(variables['Build.SourceBranch'], 'refs/heads/main'))
+#     jobs:
+#       - job: Build
+#         displayName: Build and Push to QA ACR
+#         pool:
+#           vmImage: $(vmImageName)
+#         steps:
+#           - task: Docker@2
+#             displayName: Build and push to QA ACR
+#             inputs:
+#               command: buildAndPush
+#               repository: $(imageRepository)
+#               dockerfile: $(dockerfilePath)
+#               containerRegistry: aldersgateodelqa
+#               tags: |
+#                 latest
+
+#   # Stage for 'main' branch
+#   - stage: Main
+#     displayName: Build and Push for Main
+#     condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+#     jobs:
+#       - job: Build
+#         displayName: Build and Push to Prod ACR
+#         pool:
+#           vmImage: $(vmImageName)
+#         steps:
+#           - task: Docker@2
+#             displayName: Build and push to Prod ACR
+#             inputs:
+#               command: buildAndPush
+#               repository: $(imageRepository)
+#               dockerfile: $(dockerfilePath)
+#               containerRegistry: aldersgateodelprod
+#               tags: |
+#                 latest
